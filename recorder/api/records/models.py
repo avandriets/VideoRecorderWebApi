@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean
 from sqlalchemy import DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from recorder.database import db
 
 
@@ -10,7 +10,7 @@ class RecordsSet(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    recordings = relationship('VideoCollectionItem')
+    recordings = relationship('VideoCollectionItem', cascade="all, delete-orphan")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -31,7 +31,7 @@ class VideoCollectionItem(db.Model):
 
     id = Column(Integer, primary_key=True)
     records_set_id = Column(ForeignKey('RecordsSet.id'))
-    records_set = relationship('RecordsSet')
+    records_set = relationship('RecordsSet', backref=backref("recordings_of_set", cascade="all, delete-orphan"))
     video_id = Column(ForeignKey('Video.id'))
     video = relationship('Video')
     start_time = Column(Integer, nullable=False)
